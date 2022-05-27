@@ -26,7 +26,7 @@
                 <executions>
                     <execution>
                         <id>default-jar</id>
-                        <phase>package</phase>
+                        <phase>compile</phase>
                         <goals>
                             <goal>jar</goal>
                         </goals>
@@ -47,5 +47,14 @@
                 </executions>
             </plugin>
         </plugins>
+        <resources>
+            <resource>
+                <directory>${basedir}/src/main/resources</directory>
+                <targetPath>../../../target/jnlp</targetPath>
+                <includes>
+                    <include>webstart.jnlp</include>
+                </includes>
+            </resource>
+        </resources>
     </build>
 </project>

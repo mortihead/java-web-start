@@ -4,20 +4,19 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.InputStreamResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.util.Objects;
 
 @Configuration
 @ComponentScan
@@ -30,19 +29,17 @@ public class Application {
 }
 
 @RestController
-class GreetingController {
+class DownloadController {
 
-    private static final String SERVER_LOCATION = "/jnlp";
+    @GetMapping(path = {"/jnlp/{name}", "/jnlp"})
+    public ResponseEntity<Resource> download(@PathVariable(required = false) String name) throws IOException {
+        name = Objects.isNull(name) || name.isEmpty() ? "webstart.jnlp" : name;
 
-    @RequestMapping("/hello/{name}")
-    String hello(@PathVariable String name) {
-        return "Hello, " + name + "!";
-    }
+        String resPath = DownloadController.class.getProtectionDomain().getCodeSource().getLocation().toString();
+        resPath = resPath.substring(6, resPath.lastIndexOf("classes")) + "jnlp";
 
-    @RequestMapping(path = "/jnlp/{name}", method = RequestMethod.GET)
-    public ResponseEntity<Resource> download(@PathVariable String name) throws IOException {
-
-        File file = new File(SERVER_LOCATION + File.separator + name);
+        File file = new File(resPath + File.separator + name);
+        System.out.println(file);
 
         HttpHeaders header = new HttpHeaders();
         header.add(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename="+name);
